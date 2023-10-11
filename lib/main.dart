@@ -1,4 +1,4 @@
-import 'package:blackjack/pages/game_page.dart';
+import 'package:blackjack/pages/home_page.dart';
 import 'package:blackjack/providers/deck_providder.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const GamePage(),
+      home: const HomePage(),
     );
   }
 }

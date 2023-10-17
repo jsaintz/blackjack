@@ -1,16 +1,31 @@
-# blackjack
+# BlackJack21
 
-A new Flutter project.
+## Installation
 
-## Getting Started
+**Required [Flutter](https://flutter.dev/docs/get-started/install) library**
 
-This project is a starting point for a Flutter application.
+OS X,  Web & Linux & Mobile:
 
-A few resources to get you started if this is your first Flutter project:
+```
+flutter pub get
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+flutter run
+```
+
+## Description
+
+_Este projeto como objetivo de criar um jogo chamado BlackJack21 [Api - Deck of Cards](https://deckofcardsapi.com/) ._
+
+## Development setup
+
+Esse projeto foi desenvolvido com o Flutter e Dart.
+
+## What I used
+
+- [http](https://pub.dev/packages/http) para requisições.
+- [provider](https://pub.dev/packages/provider) para gerenciador de estado.
+- [cached_network_image](https://pub.dev/packages/cached_network_image) pode ser usado diretamente ou por meio do ImageProvider.

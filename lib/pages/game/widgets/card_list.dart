@@ -18,22 +18,30 @@ class CardList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: Constants.cardHeight * size,
-      width: double.infinity,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: player.cards.length,
-        itemBuilder: (context, index) {
-          final card = player.cards[index];
-          return PlayingCard(
-            card: card,
-            size: size,
-            // visible: player.isHuman,
-            visible: true,
-            onPlayCard: onPlayCard,
-          );
-        },
+    return Container(
+      padding: EdgeInsets.only(
+        top: player.isBot ? 75 : 0,
+        left: 100,
+        bottom: player.isBot ? 0 : 70,
+      ),
+      child: SizedBox(
+        height: Constants.cardHeight * size,
+        width: double.infinity,
+        child: Stack(
+          children: player.cards.map((card) {
+            final index = player.cards.indexOf(card);
+            final leftPosition = index * 30.0;
+            return Positioned(
+              left: leftPosition,
+              child: PlayingCard(
+                card: card,
+                size: size,
+                visible: true,
+                onPlayCard: onPlayCard,
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

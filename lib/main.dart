@@ -1,8 +1,6 @@
 import 'package:blackjack/pages/game/game_page.dart';
-import 'package:blackjack/pages/home_page.dart';
 import 'package:blackjack/providers/blackjack_provider.dart';
-import 'package:blackjack/providers/deck_providder.dart';
-import 'package:blackjack/providers/game_provider.dart';
+import 'package:blackjack/providers/deck_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +12,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DeckProvider()),
-        ChangeNotifierProvider(create: (_) => GameProvider()),
         ChangeNotifierProvider(create: (_) => BlackJackProvider()),
       ],
       child: const MyApp(),
@@ -33,7 +30,7 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
       home: const GamePage(),

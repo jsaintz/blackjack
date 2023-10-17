@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:blackjack/common/constants.dart';
 import 'package:blackjack/main.dart';
 import 'package:blackjack/models/action_button_model.dart';
@@ -8,10 +10,10 @@ import 'package:blackjack/models/turn_model.dart';
 import 'package:blackjack/services/deck_services.dart';
 import 'package:flutter/material.dart';
 
-class GameProvider with ChangeNotifier {
+class DeckProvider with ChangeNotifier {
   late DeckService _service;
 
-  GameProvider() {
+  DeckProvider() {
     _service = DeckService();
   }
 
@@ -126,6 +128,10 @@ class GameProvider with ChangeNotifier {
 
     _discards.add(card);
 
+    if (player.isBot) {
+      _discards.addAll(player.cards);
+    }
+
     _turn.actionCount += 1;
 
     setLastPlayed(card);
@@ -135,8 +141,6 @@ class GameProvider with ChangeNotifier {
     if (gameIsOver) {
       finishGame();
     }
-
-    notifyListeners();
   }
 
   bool canDrawCardsFromDiscardPile({int count = 1}) {
@@ -150,17 +154,14 @@ class GameProvider with ChangeNotifier {
       return;
     }
 
-    // get the first x cards
     final start = discards.length - count;
     final end = discards.length;
     final cards = discards.getRange(start, end).toList();
 
     discards.removeRange(start, end);
 
-    // give them to player
     player.addCards(cards);
 
-    // incrment the draw count
     turn.drawCount += count;
 
     notifyListeners();
@@ -182,39 +183,33 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void skipTurn() {
-    _turn.nextTurn();
-    _turn.nextTurn();
-
-    notifyListeners();
-  }
-
   bool get gameIsOver {
     return currentDeck!.remaining! < 1;
   }
 
   void finishGame() {
-    showToast("Game over!");
     notifyListeners();
   }
 
   Future<void> botTurn() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(seconds: 1));
     await drawCards(_turn.currentPlayer);
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (_turn.currentPlayer.cards.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 1000));
-
-      playCard(
-        player: _turn.currentPlayer,
-        card: _turn.currentPlayer.cards.first,
-      );
+    final currentPlayer = _turn.currentPlayer;
+    if (currentPlayer.cards.isNotEmpty) {
+      for (int index = 0; index < currentPlayer.cards.length; index++) {
+        await Future.delayed(const Duration(seconds: 1));
+        playCard(
+          player: currentPlayer,
+          card: currentPlayer.cards[index],
+        );
+      }
     }
-
     if (canEndTurn) {
-      endTurn();
+      Future.microtask(() {
+        endTurn();
+      });
     }
+    notifyListeners();
   }
 
   void showToast(String message, {int seconds = 3, SnackBarAction? action}) {
@@ -225,5 +220,14 @@ class GameProvider with ChangeNotifier {
         action: action,
       ),
     );
+  }
+
+  Future<void> shuffleCurrentDeck() async {
+    if (_currentDeck != null) {
+      final response = await _service.reshuffleCards(_currentDeck!, count: 1);
+      _currentDeck!.remaining = response.remaining;
+      log(_currentDeck!.remaining.toString());
+      notifyListeners();
+    }
   }
 }

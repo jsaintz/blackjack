@@ -10,29 +10,36 @@ class PlayingCard extends StatelessWidget {
   final bool visible;
   final Function(CardModel)? onPlayCard;
 
-  const PlayingCard({Key? key, required this.card, this.size = 1, this.visible = false, this.onPlayCard})
-      : super(key: key);
+  const PlayingCard({
+    Key? key,
+    required this.card,
+    this.size = 1,
+    this.visible = false,
+    this.onPlayCard,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (onPlayCard != null) onPlayCard!(card);
-      },
-      child: Container(
-        width: Constants.cardWidth * size,
-        height: Constants.cardHeight * size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4.0),
+    return Center(
+      child: GestureDetector(
+        onTap: () {
+          if (onPlayCard != null) onPlayCard!(card);
+        },
+        child: Container(
+          width: Constants.cardWidth * size,
+          height: Constants.cardHeight * size,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: visible
+              ? CachedNetworkImage(
+                  imageUrl: card.image,
+                  width: Constants.cardWidth * size,
+                  height: Constants.cardHeight * size,
+                )
+              : CardBack(size: size),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: visible
-            ? CachedNetworkImage(
-                imageUrl: card.image,
-                width: Constants.cardWidth * size,
-                height: Constants.cardHeight * size,
-              )
-            : CardBack(size: size),
       ),
     );
   }

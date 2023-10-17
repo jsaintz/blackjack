@@ -1,15 +1,15 @@
 import 'dart:math';
-
 import 'package:blackjack/common/constants.dart';
 import 'package:blackjack/models/action_button_model.dart';
 import 'package:blackjack/models/card_model.dart';
-import 'package:blackjack/providers/game_provider.dart';
+import 'package:blackjack/models/player_model.dart';
+import 'package:blackjack/providers/deck_provider.dart';
 
-class BlackJackProvider extends GameProvider {
+class BlackJackProvider extends DeckProvider {
   @override
   Future<void> setupBoard() async {
     for (var player in players) {
-      await drawCards(player, count: 3, allowAnyTime: true);
+      await drawCards(player, count: 1, allowAnyTime: true);
     }
 
     await drawCardToDiscardPile();
@@ -18,28 +18,38 @@ class BlackJackProvider extends GameProvider {
   }
 
   @override
-  bool get canEndTurn {
-    return turn.drawCount == 1 && turn.actionCount == 1;
-  }
+  bool get canEndTurn => turn.drawCount == 1 && turn.actionCount == 1;
 
   @override
-  bool get canDrawCard {
-    return turn.drawCount < 1;
-  }
+  bool get canDrawCard => turn.drawCount < 1;
 
   @override
-  bool canPlayCard(CardModel card) {
-    return turn.drawCount == 1 && turn.actionCount < 1;
-  }
+  bool canPlayCard(CardModel card) => turn.drawCount == 1 && turn.actionCount < 1;
 
   @override
   bool get gameIsOver {
-    if (gameState[Constants.GS_PLAYER_HAS_KNOCKED] != null &&
-        gameState[Constants.GS_PLAYER_HAS_KNOCKED] == turn.currentPlayer) {
+    int playerScore = calculateAccumulatedPoints(players[0]);
+    int dealerScore = calculateAccumulatedPoints(players[1]);
+
+    if (dealerScore == 21 || playerScore == 21) {
       return true;
     }
 
+    if (dealerScore > 21 || playerScore > 21) {
+      return true;
+    }
+    notifyListeners();
     return false;
+  }
+
+  String evaluateScore(int score) {
+    if (score > 21) {
+      return 'Acima de 21';
+    } else if (score < 21) {
+      return 'Abaixo de 21';
+    } else {
+      return 'Igual a 21';
+    }
   }
 
   @override
@@ -77,14 +87,14 @@ class BlackJackProvider extends GameProvider {
           case Suit.spades:
             spadesPoints += points;
             break;
-          case Suit.other:
+          default:
         }
       }
 
       final totalPoints = [spadesPoints, heartsPoints, diamondsPoints, clubsPoints].fold(spadesPoints, max);
-      log(totalPoints);
 
       p.score = totalPoints;
+      evaluateScore(p.score);
     }
 
     notifyListeners();
@@ -95,22 +105,47 @@ class BlackJackProvider extends GameProvider {
 
   @override
   Future<void> botTurn() async {
-    print("TODO: bot turn"); //TODO: update bot logic
+    if (gameIsOver) {
+      return;
+    }
+
     super.botTurn();
   }
 
   @override
-  // TODO: implement additionalButtons
-  List<ActionButton> get additionalButtons {
-    return [
-      ActionButton(
-        label: "Knock",
-        onPressed: () {
-          gameState[Constants.GS_PLAYER_HAS_KNOCKED] = turn.currentPlayer;
+  List<ActionButton> get additionalButtons => [
+        ActionButton(
+          label: "Encerar turno",
+          onPressed: () {
+            gameState[Constants.GS_PLAYER_HAS_KNOCKED] = turn.currentPlayer;
 
-          endTurn();
-        },
-      ),
-    ];
+            endTurn();
+          },
+        ),
+      ];
+
+  int calculateAccumulatedPoints(PlayerModel player) {
+    int points = 0;
+
+    for (final card in player.cards) {
+      switch (card.value) {
+        case "KING":
+        case "QUEEN":
+        case "JACK":
+          points += 10;
+          break;
+        case "ACE":
+          points += 11;
+          break;
+        default:
+          points += int.parse(card.value);
+      }
+    }
+    return points;
+  }
+
+  Future<void> shuffleCurrentDecks() async {
+    await shuffleCurrentDeck();
+    notifyListeners();
   }
 }

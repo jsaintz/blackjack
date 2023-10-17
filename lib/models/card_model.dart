@@ -12,11 +12,13 @@ class CardModel {
   final String image;
   final Suit suit;
   final String value;
+  final String code;
 
   CardModel({
     required this.image,
     required this.suit,
     required this.value,
+    required this.code,
   });
 
   factory CardModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class CardModel {
       image: json['image'],
       suit: stringToSuit(json['suit']),
       value: json['value'],
+      code: json['code'],
     );
   }
 

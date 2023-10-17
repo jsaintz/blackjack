@@ -23,6 +23,20 @@ class DeckService extends ApiService {
     final data = await httpGet(path, params: params);
 
     if (data != null) {
+      log(data.toString());
+      return DrawModel.fromJson(data);
+    } else {
+      throw Exception('Falha ao obter dados para fazer uma jogada.');
+    }
+  }
+
+  Future<DrawModel> reshuffleCards(DeckModel deck, {int count = 1}) async {
+    final path = '/deck/${deck.deckId}/shuffle/?remaining=true ';
+    final params = {'count': count};
+    final data = await httpGet(path, params: params);
+
+    if (data != null) {
+      log(data.toString());
       return DrawModel.fromJson(data);
     } else {
       throw Exception('Falha ao obter dados para fazer uma jogada.');

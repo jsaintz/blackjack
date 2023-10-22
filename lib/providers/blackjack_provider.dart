@@ -38,7 +38,6 @@ class BlackJackProvider extends DeckProvider {
     if (dealerScore > 21 || playerScore > 21) {
       return true;
     }
-    notifyListeners();
     return false;
   }
 
